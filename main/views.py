@@ -1,9 +1,9 @@
 from django.contrib import messages
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import authenticate, login, logout
+from django.contrib.admin.views.decorators import staff_member_required
 from .forms import RegisterForm, LoginForm, RequestForm
 from .models import Request
-from django.contrib.auth import logout
 
 def register_view(request):
     if request.method == 'POST':
@@ -33,6 +33,11 @@ def login_view(request):
     else:
         form = LoginForm()
     return render(request, 'login.html', {'form': form})
+
+def logout_view(request):
+    logout(request)
+    messages.success(request, 'Вы успешно вышли из системы.')
+    return redirect('home')
 
 def home_view(request):
     return render(request, 'home.html')
@@ -70,7 +75,7 @@ def delete_request_view(request, request_id):
     messages.success(request, 'Заявка удалена')
     return redirect('profile')
 
-def logout_view(request):
-    logout(request)
-    messages.success(request, 'Вы успешно вышли из системы.')
-    return redirect('home')
+@staff_member_required
+def admin_dashboard(request):
+    all_requests = Request.objects.all().order_by('-created_at')
+    return render(request, 'admin_dashboard.html', {'requests': all_requests})

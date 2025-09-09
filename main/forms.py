@@ -23,7 +23,7 @@ class LoginForm(forms.Form):
 class RequestForm(forms.ModelForm):
     class Meta:
         model = Request
-        fields = ['title', 'description', 'image']
+        fields = ['title', 'description', 'category', 'image']
         widgets = {
             'description': forms.Textarea(attrs={'rows': 4}),
         }

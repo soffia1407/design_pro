@@ -1,0 +1,26 @@
+{% extends 'base.html' %}
+
+{% block title %}Панель администратора{% endblock %}
+
+{% block content %}
+<div class="home-content">
+    <h2>Панель администратора</h2>
+    <p>Все заявки пользователей. Для управления статусами используй <a href="/admin/main/request/">админку Django</a></p>
+
+    <h3>Все заявки ({{ requests.count }})</h3>
+    {% if requests %}
+        {% for req in requests %}
+        <div class="request-item">
+            <h4>{{ req.title }}</h4>
+            <p><strong>Пользователь:</strong> {{ req.user.username }}</p>
+            <p><strong>Категория:</strong> {{ req.category }}</p>
+            <p><strong>Статус:</strong> {{ req.status }}</p>
+            <p><strong>Дата:</strong> {{ req.created_at|date:"d.m.Y H:i" }}</p>
+            <a href="/admin/main/request/{{ req.id }}/change/" class="btn">Изменить статус в админке</a>
+        </div>
+        {% endfor %}
+    {% else %}
+        <p>Заявок нет</p>
+    {% endif %}
+</div>
+{% endblock %}
