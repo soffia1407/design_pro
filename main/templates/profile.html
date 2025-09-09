@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+
+{% block title %}Личный кабинет{% endblock %}
+
+{% block content %}
+<div class="home-content">
+    <h2>Личный кабинет</h2>
+    <p>Добро пожаловать, <strong>{{ user.username }}</strong>!</p>
+    <p>Email: <strong>{{ user.email }}</strong></p>
+    
+    <div class="services-preview">
+        <h3>Ваши данные:</h3>
+        <ul>
+            <li>Имя пользователя: {{ user.username }}</li>
+            <li>Email: {{ user.email }}</li>
+            <li>Дата регистрации: {{ user.date_joined|date:"d.m.Y" }}</li>
+        </ul>
+    </div>
+    
+    <p>Здесь вы можете управлять своими настройками и заявками.</p>
+
+    <form method="post" action="{% url 'logout' %}">
+    {% csrf_token %}
+    <button type="submit" style="background: #8c7b6b; color: white; padding: 10px; border: none; border-radius: 4px; cursor: pointer;">
+        Выйти
+    </button>
+    </form>
+</div>
+{% endblock %}
