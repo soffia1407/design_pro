@@ -6,24 +6,27 @@
 <div class="home-content">
     <h2>Личный кабинет</h2>
     <p>Добро пожаловать, <strong>{{ user.username }}</strong>!</p>
-    <p>Email: <strong>{{ user.email }}</strong></p>
     
     <div class="services-preview">
-        <h3>Ваши данные:</h3>
-        <ul>
-            <li>Имя пользователя: {{ user.username }}</li>
-            <li>Email: {{ user.email }}</li>
-            <li>Дата регистрации: {{ user.date_joined|date:"d.m.Y" }}</li>
-        </ul>
+        <h3>Мои заявки на дизайн</h3>
+        {% if requests %}
+            {% for req in requests %}
+            <div class="request-item">
+                <h4>{{ req.title }}</h4>
+                <p>Описание: {{ req.description|truncatewords:20 }}</p>
+                <p>Статус: {{ req.status }}</p>
+                <p>Дата: {{ req.created_at|date:"d.m.Y" }}</p>
+                <form method="post" action="{% url 'delete_request' req.id %}">
+                    {% csrf_token %}
+                    <button type="submit" class="delete-btn">Удалить</button>
+                </form>
+            </div>
+            {% endfor %}
+        {% else %}
+            <p>У вас пока нет заявок</p>
+        {% endif %}
+        
+        <a href="{% url 'create_request' %}" class="btn">Создать новую заявку</a>
     </div>
-    
-    <p>Здесь вы можете управлять своими настройками и заявками.</p>
-
-    <form method="post" action="{% url 'logout' %}">
-    {% csrf_token %}
-    <button type="submit" style="background: #8c7b6b; color: white; padding: 10px; border: none; border-radius: 4px; cursor: pointer;">
-        Выйти
-    </button>
-    </form>
 </div>
 {% endblock %}

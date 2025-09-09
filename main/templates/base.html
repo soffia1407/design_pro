@@ -14,6 +14,7 @@
             <ul>
                 <li><a href="{% url 'home' %}">Главная</a></li>
                 {% if user.is_authenticated %}
+                    <li><a href="{% url 'create_request' %}">Создать заявку</a></li>
                     <li><a href="{% url 'profile' %}">Личный кабинет</a></li>
                     <li><a href="{% url 'logout' %}">Выйти</a></li>
                 {% else %}

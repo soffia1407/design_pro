@@ -1,13 +1,9 @@
 from django.contrib import messages
-from django.shortcuts import render, redirect
-from django.contrib.auth import authenticate, login
-from .forms import RegisterForm, LoginForm
+from django.shortcuts import render, redirect, get_object_or_404
+from django.contrib.auth import authenticate, login, logout
+from .forms import RegisterForm, LoginForm, RequestForm
+from .models import Request
 from django.contrib.auth import logout
-
-def logout_view(request):
-    logout(request)
-    messages.success(request, 'Вы успешно вышли из системы.')
-    return redirect('home')
 
 def register_view(request):
     if request.method == 'POST':
@@ -15,7 +11,7 @@ def register_view(request):
         if form.is_valid():
             user = form.save()
             login(request, user)
-            messages.success(request, 'Регистрация прошла успешно! Добро пожаловать в личный кабинет.')
+            messages.success(request, 'Регистрация прошла успешно!')
             return redirect('profile')
     else:
         form = RegisterForm()
@@ -30,10 +26,10 @@ def login_view(request):
             user = authenticate(request, username=username, password=password)
             if user is not None:
                 login(request, user)
-                messages.success(request, 'Добро пожаловать в личный кабинет!')
+                messages.success(request, 'Добро пожаловать!')
                 return redirect('profile')
             else:
-                messages.error(request, 'Неверное имя пользователя или пароль.')
+                messages.error(request, 'Неверные данные')
     else:
         form = LoginForm()
     return render(request, 'login.html', {'form': form})
@@ -43,6 +39,38 @@ def home_view(request):
 
 def profile_view(request):
     if not request.user.is_authenticated:
-        messages.error(request, 'Пожалуйста, войдите в систему.')
         return redirect('login')
-    return render(request, 'profile.html')
+    
+    user_requests = Request.objects.filter(user=request.user)
+    return render(request, 'profile.html', {'requests': user_requests})
+
+def create_request_view(request):
+    if not request.user.is_authenticated:
+        return redirect('login')
+    
+    if request.method == 'POST':
+        form = RequestForm(request.POST, request.FILES)
+        if form.is_valid():
+            request_obj = form.save(commit=False)
+            request_obj.user = request.user
+            request_obj.save()
+            messages.success(request, 'Заявка создана!')
+            return redirect('profile')
+    else:
+        form = RequestForm()
+    
+    return render(request, 'create_request.html', {'form': form})
+
+def delete_request_view(request, request_id):
+    if not request.user.is_authenticated:
+        return redirect('login')
+    
+    request_obj = get_object_or_404(Request, id=request_id, user=request.user)
+    request_obj.delete()
+    messages.success(request, 'Заявка удалена')
+    return redirect('profile')
+
+def logout_view(request):
+    logout(request)
+    messages.success(request, 'Вы успешно вышли из системы.')
+    return redirect('home')
